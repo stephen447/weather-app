@@ -29,6 +29,7 @@ function App() {
       .then(data =>{setData(data)})
     }
     else{
+      setLocation("")
       fetch(`http://api.openweathermap.org/data/2.5/weather?id=524901&q=${location},IE&units=metric&appid=${apikey}`)
       .then((response)=>{
         if (response.ok){
@@ -117,10 +118,8 @@ function App() {
         <p> Weather for your current location</p>
       ):(
         <div className='form'>
-          <label>Enter your location:
-            <input type="text" value={location} className="textfield" onChange={(e) => setLocation(e.target.value)}/>
-            <input type="submit" className="submitbutton" onClick={handleSubmit}/>
-          </label>
+          <input type="text" value={location} className="textfield" placeholder="Enter a location" onChange={(e) => setLocation(e.target.value)}/>
+          <input type="submit" className="submitbutton" onClick={handleSubmit}/>
         </div>
       )
       }
