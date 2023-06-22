@@ -9,6 +9,7 @@ function App() {
   const [data, setData] = useState(undefined)
   const [longitude, setLongitude] = useState(undefined)
   const [latitude, setLatitude] = useState(undefined)
+  const [colour, setColour] = useState("green")
 
   function componentDidMount() {
     navigator.geolocation.getCurrentPosition(function(position) {
@@ -29,18 +30,33 @@ function App() {
     }
     else{
       fetch(`http://api.openweathermap.org/data/2.5/weather?id=524901&q=${location},IE&units=metric&appid=${apikey}`)
-      .then(response => response.json())
+      .then((response)=>{
+        if (response.ok){
+          return response.json()
+        }
+        else{
+          throw new Error("Status code error :" + response.status)
+        }}) 
       .then(data =>{setData(data)})
+      .catch((error)=>{console.log("caught error", error)})
     }
   }
 
   const handleclick = (e) =>{
+    if(currentloc===true){
+      setColour("black")
+    }
+    else{
+      setColour("green")
+    }
     setCurrentloc((current) => !current);
+    
     if(currentloc===false){
       let apikey = '6e7e45fd86e60c1ed32d3373a9b51508'
       fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apikey}`)
       .then(response => response.json())
       .then(data =>{setData(data)})
+      .catch((error)=>{console.log("caught error")})
       
     }
     
@@ -96,14 +112,14 @@ function App() {
   useEffect(componentDidMount)
   return (
     <div className="App">
-      <Button onClick={handleclick}>Hello </Button>
+      <Button variant='contained' sx={{ ":hover":{backgroundColor:"coral", color:"black"}, backgroundColor: colour, color: 'coral' }} className="location_button"onClick={handleclick}>Current location </Button>
       {currentloc===true?(
         <p> Weather for your current location</p>
       ):(
         <div className='form'>
           <label>Enter your location:
-            <input type="text" value={location} onChange={(e) => setLocation(e.target.value)}/>
-            <input type="submit" onClick={handleSubmit}/>
+            <input type="text" value={location} className="textfield" onChange={(e) => setLocation(e.target.value)}/>
+            <input type="submit" className="submitbutton" onClick={handleSubmit}/>
           </label>
         </div>
       )
@@ -117,7 +133,7 @@ function App() {
       <div className='city'>
         <div className="city">
         <h1>{data.name}</h1>
-      </div>
+        </div>
 
       <div className="weather-info">
         <div className="container">
@@ -127,8 +143,9 @@ function App() {
             <p> Minimum temperature: {data.main.temp_min} Celcius</p>    
           </div>
           <div className='column'>
-            <p> Feels like: {data.main.feels_like}</p>      
+            <p> Feels like: {data.main.feels_like} Celcius</p>      
             <p>{data.weather[0].main}</p> 
+            <p>Wind speed: {data.wind.speed} km/h</p>
           </div>
         </div>
         <div className='icon'>
